@@ -25,6 +25,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         $data = [
             'user' => $user,
@@ -69,7 +70,7 @@ class AuthController extends Controller
     //Cerrar sesión
     public function logout (Request $request)
     {
-        logout()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,
