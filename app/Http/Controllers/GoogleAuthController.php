@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
+use App\Services\SocialService;
 
 class GoogleAuthController extends Controller
 {
+    protected $socialService;
+
+    //Inyectar el servicio de SocialService para manejar la lógica de autenticación social
+    public function __construct(SocialService $socialService)
+    {
+        $this->socialService = $socialService;
+    }
+
     //Redirigir al usuario a la página de autenticación de Google
     public function redirect()
     {
@@ -17,20 +25,26 @@ class GoogleAuthController extends Controller
     //Manejar la respuesta de Google después de la autenticación
     public function callback()
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        //Obtener la información del usuario autenticado con Google
+        try{
+            $googleUser = Socialite::driver('google')->stateless()->user();
+        }
+        catch (\Exception $e) {
+            $frontend = env('FRONTEND_URL', 'http://localhost:8000');
+            return redirect()->to($frontend . '/login?error=google_auth_failed');
+        }
 
-        $user = User::updateOrCreate([
-            'email' => $googleUser->getEmail()
-            ], [
-                'username' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
-                'password' => Hash::make(str()->random(24)),
-            ]);
+        $user = $this->socialService->findOrCreate($googleUser, 'google');
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-            $frontend = env('FRONTEND_URL', 'http://localhost:8000/dashboard.html');
+        $frontend = env('FRONTEND_URL', 'http://localhost:8000');
+        $redirectUrl = $frontend . '/auth/callback?token=' . $token;
 
-        return redirect()->to($frontend . '/auth/callback?token=' . $token);
+        if($this->socialService->profileIncomplete($user)){
+            $redirectUrl .= '&action=complete_profile';
+        }
+
+        return redirect()->to($redirectUrl);
     }
 }
