@@ -169,6 +169,7 @@ form {
 
 .forgot-link a {
     color: var(--text-muted);
+    color:#7494ec;
     text-decoration: none;
     font-size: 14.5px;
     transition: color 0.3s;
@@ -279,7 +280,11 @@ form {
 }
 
 .toggle-panel p {
-    margin-bottom: 20px;
+    font-size: 14.5px;
+    line-height: 1.6;       
+    margin-bottom: 20px;   
+    padding: 0 40px;        
+    text-align: center;
 }
 
 .toggle-panel .btn {
@@ -293,6 +298,8 @@ form {
 .toggle-panel .btn:hover {
     background: rgba(255, 255, 255, 0.1);
 }
+
+
 
 @media screen and (max-width: 650px) {
     .container {

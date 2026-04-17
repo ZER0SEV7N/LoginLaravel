@@ -47,6 +47,12 @@ class SocialAuthController extends Controller
         return redirect()->to($redirectUrl);
     }
 
+    public function webRedirect($provider)
+    {
+        // SIN stateless() para Web
+        return Socialite::driver($provider)->redirect(); 
+    }
+
     public function webCallback($provider)
     {
         try{

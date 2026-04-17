@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use App\Models\User;
 
 //AuthController
@@ -175,4 +176,116 @@ class AuthController extends Controller
         }
     }
 
+    //SECCION WEB:
+    //Web login
+    public function webLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if(!$user || !Hash::check($request->password, $user->password)) {
+            return redirect()->route('login')->with('error', 'Credenciales invalidas');
+        }
+
+        auth()->login($user, true);
+
+        return redirect()->route('dashboard');
+    }
+
+    //Web register
+    public function webRegister(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'lastname' => 'nullable|string|max:50',
+            'username' => 'required|string|max:50',
+            'email' => 'required|string|email|max:100|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'document' => 'nullable|string|max:15|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'lastname' => $request->lastname,
+            'username' => $request->username,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'document' => $request->document,
+            'password' => Hash::make($request->password),
+        ]);
+
+        auth()->login($user, true);
+
+        return redirect()->route('dashboard');
+    }
+
+    //Web logout
+    public function webLogout(Request $request)
+    {
+        auth()->logout();
+
+        return redirect()->route('login');
+    }
+
+    //Procesar la solicitud de recuperación de contraseña web
+    public function webForgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+        ]);
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        if($status === Password::RESET_LINK_SENT)
+            return redirect()->route('password.request')->with('success', 'Enlace de restablecimiento de contraseña enviado exitosamente');
+        else
+            return redirect()->route('password.request')->with('error', 'No se pudo enviar el enlace de restablecimiento de contraseña');
+        
+    }
+
+    //Procesar el restablecimiento de contraseña web
+    public function webResetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function($user, $password){
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+                
+                $user->save();
+            }
+        );
+        if($status === Password::PASSWORD_RESET)
+            return redirect()->route('login')->with('success', 'Your password has been reset successfully. You can now log in with your new password.');
+        else 
+            return back()->withErrors(['email' => 'It was not possible to reset the password. Please try again.']);
+    }
+
+    //web completar perfil después de autenticación social
+    public function webCompleteProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'lastname' => 'required|string|max:50',
+            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'document' => 'nullable|string|max:15|unique:users,document,' . $user->id,
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('dashboard')->with('success', 'Profile registered successfully');
+    }
 }

@@ -15,10 +15,15 @@ class User extends Authenticatable
     use HasApiTokens;
 
     protected $fillable = [
+        'name',         
+        'lastname',
         'username',
         'email',
+        'phone',
+        'document',
         'password',
-        'google_id'
+        'google_id',    
+        'github_id',
     ];
 
     protected $hidden = [

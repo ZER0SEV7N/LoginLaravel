@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <title>Document</title>
+    <title>Login and register</title>
 </head>
 <body class="{{ session('theme') == 'dark' ? 'dark-mode' : '' }}">
     <div class="container {{ $errors->has('register') ? 'active' : '' }}">
@@ -15,7 +15,7 @@
             @csrf
             <h1>Login ZER0</h1>
             <div class="input-box">
-                <input type="text" name="email" placeholder="Username" required>
+                <input type="text" name="email" placeholder="Email" required>
                 <i class='bx bxs-user' ></i>
             </div>
             <div class="input-box">
@@ -23,7 +23,7 @@
                 <i class='bx bxs-lock-alt' ></i>
             </div>
             <div class="forgot-link">
-                <a href="#">Forgot password?</a>
+                <a href="{{ route('password.request') }}">Forgot password?</a>
             </div>
             <button type="submit" class="btn">Login</button>
             <p>or login with social platforms</p>
@@ -38,6 +38,15 @@
         <form action="{{ route('web.register') }}" method="POST">
             @csrf
             <h1>Registration ZER0</h1>
+            @if($errors->any())
+                <div style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px; text-align: left;">
+                    <ul style="list-style: none; padding: 0;">
+                        @foreach ($errors->all() as $error)
+                            <li><i class='bx bx-error'></i>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <div class="name-group">
                 <div class="input-box">
                     <input type="text" name="name" placeholder="Name" required>
@@ -96,4 +105,5 @@
 
  </div>
 </body>
+<script src="{{ asset('js/script.js') }}"></script>
 </html>
