@@ -14,6 +14,18 @@
         <form action="{{ route('web.login') }}" method="POST">
             @csrf
             <h1>Login ZER0</h1>
+            
+            @if(old('form_type') == 'login' && $errors->any())
+                <div style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px; text-align: left;">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px; text-align: left;">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
             <div class="input-box">
                 <input type="text" name="email" placeholder="Email" required>
                 <i class='bx bxs-user' ></i>

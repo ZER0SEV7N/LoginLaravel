@@ -20,8 +20,8 @@
                     <div style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px;">{{ $errors->first() }}</div>
                 @endif
 
-                <input type="hidden" name="token" value="{{ request()->query('token') }}">
-                <input type="hidden" name="email" value="{{ request()->query('email') }}">
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ old('email', $email) }}">
 
                 <div class="input-box">
                     <input type="password" name="password" placeholder="New Password" required>

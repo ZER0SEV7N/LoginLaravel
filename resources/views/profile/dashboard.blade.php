@@ -13,12 +13,13 @@
         <div style="width: 100%; max-width: 400px;">
             <i class='bx bx-user-circle' style="font-size: 100px; color: var(--primary-color); margin-bottom: 20px;"></i>
             
-            <h1 style="margin-bottom: 10px;">Welcome, {{ auth()->user()->name }}!</h1>
+            <h1 style="margin-bottom: 10px;">Welcome, {{ auth()->user()->name }} {{ auth()->user()->lastname ?? '' }}!</h1>
             
             <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
                 <p><strong><i class='bx bx-envelope'></i> Email:</strong> {{ auth()->user()->email }}</p>
-                <p><strong><i class='bx bx-user'></i> Username:</strong> {{ auth()->user()->username ?? 'No definido' }}</p>
-                <p><strong><i class='bx bx-id-card'></i> Documento:</strong> {{ auth()->user()->document ?? 'No definido' }}</p>
+                <p><strong><i class='bx bx-user'></i> Username:</strong> {{ auth()->user()->username ?? 'Not defined' }}</p>
+                <p><strong><i class='bx bx-id-card'></i> Document:</strong> {{ auth()->user()->document ?? 'Not defined' }}</p>
+                <p><strong><i class='bx bx-phone'></i> Phone:</strong> {{ auth()->user()->phone ?? 'Not defined' }}</p>
             </div>
 
             <form action="{{ route('web.logout') }}" method="POST">

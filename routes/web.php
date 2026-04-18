@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SocialAuthController;
@@ -21,8 +22,11 @@ Route::get('/forgot-password', function () {
     return view('auth.forgot_password');
 })->name('password.request');
 
-Route::get('/reset-password', function () {
-    return view('auth.reset_password');
+Route::get('/reset-password/{token}', function (Request $request, $token) {
+    return view('auth.reset_password', [
+        'token' => $token,
+        'email' => $request->query('email')
+    ]);
 })->name('password.reset');
 
 //Procesar solicitudes de recuperación de contraseña web

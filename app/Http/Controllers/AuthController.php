@@ -241,9 +241,9 @@ class AuthController extends Controller
         $status = Password::sendResetLink($request->only('email'));
 
         if($status === Password::RESET_LINK_SENT)
-            return redirect()->route('password.request')->with('success', 'Enlace de restablecimiento de contraseña enviado exitosamente');
+            return redirect()->route('password.request')->with('success', 'Recovery link sent successfully. Please check your email.');
         else
-            return redirect()->route('password.request')->with('error', 'No se pudo enviar el enlace de restablecimiento de contraseña');
+            return redirect()->route('password.request')->with('error', 'Cannot send the recovery email, try again.');
         
     }
 
@@ -269,7 +269,7 @@ class AuthController extends Controller
         if($status === Password::PASSWORD_RESET)
             return redirect()->route('login')->with('success', 'Your password has been reset successfully. You can now log in with your new password.');
         else 
-            return back()->withErrors(['email' => 'It was not possible to reset the password. Please try again.']);
+            return back()->withErrors(['email' => __($status)]);
     }
 
     //web completar perfil después de autenticación social
